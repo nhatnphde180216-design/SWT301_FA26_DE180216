@@ -1,19 +1,74 @@
 package lab2.account;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
+/** Nghiệp vụ quản lý tài khoản, lưu trong bộ nhớ (HashMap), không phụ thuộc thời gian thực trừ ngày hiện tại khi đăng ký. */
 public class AccountService {
+
     public static final int MAX_FAILED_ATTEMPTS = 5;
     public static final int PASSWORD_HISTORY_SIZE = 3;
     public static final int MIN_AGE = 18;
 
+    private final Map<String, Account> accountsByUsername = new HashMap<>(); // key: username lowercase
+    private final Map<String, String> usernameByEmail = new HashMap<>();     // email lowercase -> username key
+
     public AccountService() {
     }
 
+    // ================= Đăng ký =================
     public ResultCode register(String username, String email, String password,
                                String confirmPassword, LocalDate dateOfBirth, String phone) {
-        throw new UnsupportedOperationException("TODO");
+        LocalDate today = LocalDate.now();
+        // BR-REG-01
+        if (isBlank(username) || isBlank(email) || isBlank(password) || isBlank(confirmPassword)
+                || dateOfBirth == null || dateOfBirth.isAfter(today)) {
+            return ResultCode.INVALID_INPUT;
+        }
+        // BR-REG-02
+        if (!AccountValidator.isValidUsername(username)) {
+            return ResultCode.INVALID_USERNAME;
+        }
+        // BR-REG-04
+        if (!AccountValidator.isValidEmail(email)) {
+            return ResultCode.INVALID_EMAIL;
+        }
+        // BR-REG-06
+        if (!AccountValidator.isValidPassword(password, username)) {
+            return ResultCode.WEAK_PASSWORD;
+        }
+        // BR-REG-07
+        if (!password.equals(confirmPassword)) {
+            return ResultCode.PASSWORD_MISMATCH;
+        }
+        // BR-REG-08
+        if (AccountValidator.calculateAge(dateOfBirth, today) < MIN_AGE) {
+            return ResultCode.UNDERAGE;
+        }
+        // BR-REG-09 (phone tùy chọn: null hoặc "" được chấp nhận)
+        if (phone != null && !phone.isEmpty() && !AccountValidator.isValidPhone(phone)) {
+            return ResultCode.INVALID_PHONE;
+        }
+        String userKey = key(username);
+        String emailKey = key(email);
+        // BR-REG-03
+        if (accountsByUsername.containsKey(userKey)) {
+            return ResultCode.DUPLICATE_USERNAME;
+        }
+        // BR-REG-05
+        if (usernameByEmail.containsKey(emailKey)) {
+            return ResultCode.DUPLICATE_EMAIL;
+        }
+        // BR-REG-10
+        String salt = PasswordHasher.generateSalt();
+        Account account = new Account(username, emailKey, dateOfBirth, phone,
+                salt, PasswordHasher.hash(salt, password));
+        accountsByUsername.put(userKey, account);
+        usernameByEmail.put(emailKey, userKey);
+        return ResultCode.SUCCESS;
     }
 
     public ResultCode login(String username, String password) {
@@ -42,10 +97,21 @@ public class AccountService {
     }
 
     public Optional<Account> findByUsername(String username) {
-        throw new UnsupportedOperationException("TODO");
+        if (isBlank(username)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(accountsByUsername.get(key(username)));
     }
 
     public boolean isLocked(String username) {
-        throw new UnsupportedOperationException("TODO");
+        return findByUsername(username).map(Account::isLocked).orElse(false);
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.isBlank();
+    }
+
+    private static String key(String s) {
+        return s.toLowerCase(Locale.ROOT);
     }
 }
