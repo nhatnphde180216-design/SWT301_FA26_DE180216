@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Thực thể tài khoản. Các hàm thay đổi trạng thái để package-private: chỉ AccountService được gọi. */
 public class Account {
     private final String username;
     private final String email;
@@ -54,7 +53,6 @@ public class Account {
         failedAttempts = 0;
     }
 
-    /** Thêm băm mới vào lịch sử, chỉ giữ tối đa maxHistory phần tử (bỏ phần tử cũ nhất). */
     void changePasswordHash(String newHash, int maxHistory) {
         passwordHistory.add(newHash);
         while (passwordHistory.size() > maxHistory) {

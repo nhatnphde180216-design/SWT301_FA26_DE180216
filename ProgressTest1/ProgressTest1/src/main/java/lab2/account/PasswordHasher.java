@@ -6,7 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HexFormat;
 
-/** Băm mật khẩu SHA-256 + salt. Kết quả là chuỗi hex 64 ký tự. */
+
 public final class PasswordHasher {
 
     private static final int SALT_BYTES = 16;

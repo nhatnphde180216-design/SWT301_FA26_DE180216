@@ -1,5 +1,4 @@
 package lab2.account;
 
-/** Kết quả của yêu cầu quên mật khẩu: mã kết quả + token (null nếu không thành công). */
 public record TokenResult(ResultCode code, String token) {
 }

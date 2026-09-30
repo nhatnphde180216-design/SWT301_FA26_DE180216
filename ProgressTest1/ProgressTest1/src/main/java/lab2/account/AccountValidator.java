@@ -5,15 +5,11 @@ import java.time.Period;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-/** Các hàm kiểm tra dữ liệu thuần túy (static, không trạng thái, không ném exception với null). */
 public final class AccountValidator {
 
-    /** BR-REG-02: 5–20 ký tự, bắt đầu bằng chữ cái, chỉ gồm chữ ASCII, số, dấu _. */
     private static final Pattern USERNAME = Pattern.compile("^[A-Za-z][A-Za-z0-9_]{4,19}$");
-    /** BR-REG-04: local@domain.tld, các nhãn domain không rỗng, TLD >= 2 chữ cái. */
     private static final Pattern EMAIL =
             Pattern.compile("^[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,}$");
-    /** BR-REG-09: 10 chữ số, đầu số 03/05/07/08/09. */
     private static final Pattern PHONE = Pattern.compile("^0[35789]\\d{8}$");
 
     private static final int EMAIL_MAX_LENGTH = 100;
@@ -34,7 +30,6 @@ public final class AccountValidator {
                 && EMAIL.matcher(email).matches();
     }
 
-    /** BR-REG-06. username null/blank thì bỏ qua điều kiện "không chứa username". */
     public static boolean isValidPassword(String password, String username) {
         if (password == null
                 || password.length() < PASSWORD_MIN_LENGTH
@@ -65,12 +60,10 @@ public final class AccountValidator {
         return true;
     }
 
-    /** Chỉ kiểm tra định dạng; null trả false. Việc phone là tùy chọn do AccountService xử lý. */
     public static boolean isValidPhone(String phone) {
         return phone != null && PHONE.matcher(phone).matches();
     }
 
-    /** Số tuổi tròn năm tính đến ngày today (sinh nhật hôm nay là đã đủ tuổi). */
     public static int calculateAge(LocalDate dob, LocalDate today) {
         return Period.between(dob, today).getYears();
     }
