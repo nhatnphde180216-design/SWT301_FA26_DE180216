@@ -1,10 +1,7 @@
 # SWT301 – ProgressTest 1: Unit Testing với JUnit 5
 
-> **Sinh viên:** Nguyễn Phước Hoài Nhật – MSSV: DE180216  
-> **Môn:** SWT301 – Software Testing  
-> **Chủ đề:** Unit Testing module *Account Management* bằng JUnit 5 và Parameterized Test  
 
----
+
 
 ## 1. Hướng dẫn chạy kiểm thử (How to run)
 
